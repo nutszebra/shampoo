@@ -45,7 +45,7 @@ class Shampoo(Optimizer):
                         state['L_inv_quarter'] = self.quarter(L)
                         state['R_inv_quarter'] = self.quarter(R)
                     L_inv_quarter, R_inv_quarter = state['L_inv_quarter'], state['R_inv_quarter']
-                    step_size = (group['lr'] * L_inv_quarter @ grad @s R_inv_quarter).view(p.data.size())
+                    step_size = (group['lr'] * L_inv_quarter @ grad @ R_inv_quarter).view(p.data.size())
                 else:
                     step_size = group['lr'] * grad
                 p.data += -step_size
