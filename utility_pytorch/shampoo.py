@@ -10,8 +10,6 @@ class Shampoo(Optimizer):
         super(Shampoo, self).__init__(params, defaults)
 
     def quarter(self, mat):
-        import IPython
-        IPython.embed()
         s, v, d = torch.svd(mat)
         return s @  (u ** -0.25 + 1.0e-6).diag() @ s.t()
 
