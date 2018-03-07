@@ -37,8 +37,8 @@ class Shampoo(Optimizer):
                 if len(state) == 0:
                     m, n = grad.size()[0], self.prod(grad.size()[1:])
                     state['step'] = 0
-                    state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
-                    state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
+                    state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-4).diag()
+                    state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-4).diag()
                     state['L_inv_quarter'] = p.data.new(m, m).zero_()
                     state['R_inv_quarter'] = p.data.new(n, n).zero_()
                     state['exp_avg'] = grad
@@ -52,7 +52,7 @@ class Shampoo(Optimizer):
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
                     R = R + grad.t() @ grad
-                    if (state['step'] % 10) == 0:
+                    if (state['step'] % 20) == 0:
                         state['L_inv_quarter'] = self.quarter(L)
                         state['R_inv_quarter'] = self.quarter(R)
                     L_inv_quarter, R_inv_quarter = state['L_inv_quarter'], state['R_inv_quarter']
