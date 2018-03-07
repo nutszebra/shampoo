@@ -5,13 +5,20 @@ from torch.optim import Optimizer
 
 class Shampoo(Optimizer):
 
-    def __init__(self, params, lr=1e-1, weight_decay=1e-4):
-        defaults = dict(lr=lr, weight_decay=weight_decay)
+    def __init__(self, params, momentum=0.9, lr=1e-1, weight_decay=1e-4):
+        defaults = dict(lr=lr, momentum=momentum, weight_decay=weight_decay)
         super(Shampoo, self).__init__(params, defaults)
 
     def quarter(self, mat):
         s, v, d = torch.svd(mat)
         return s @  (v ** -0.25 + 1.0e-6).diag() @ s.t()
+
+    @staticmethod
+    def prod(size):
+        cum = 1
+        for i in size:
+            cum *= i
+        return cum
 
     def step(self, closure=None):
         loss = None
@@ -27,17 +34,21 @@ class Shampoo(Optimizer):
                     raise RuntimeError('AdamW does not support sparse gradients, please consider SparseAdam instead')
 
                 state = self.state[p]
+                if len(state) == 0:
+                    m, n = grad.size()[0], self.prod(grad.size()[1:])
+                    state['step'] = 0
+                    state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
+                    state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
+                    state['L_inv_quarter'] = p.data.new(m, m).zero_()
+                    state['R_inv_quarter'] = p.data.new(n, n).zero_()
+                    state['exp_avg'] = grad
+
+                state['exp_avg'].mul_(group['momentum']).add_(1 - group['momentum'], grad)
+                grad = state['exp_avg']
 
                 # State initialization
-                if p.dim() == 4:
+                if p.dim() == 2 or p.dim() == 4:
                     grad = grad.view(p.data.size(0), -1)
-                    if len(state) == 0:
-                        m, n = grad.size()
-                        state['step'] = 0
-                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
-                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
-                        state['L_inv_quarter'] = p.data.new(m, m).zero_()
-                        state['R_inv_quarter'] = p.data.new(n, n).zero_()
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
                     R = R + grad.t() @ grad
