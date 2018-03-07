@@ -5,7 +5,7 @@ from torch.optim import Optimizer
 
 class Shampoo(Optimizer):
 
-    def __init__(self, params, lr=1e-1, momentum=0.9, weight_decay=1e-4):
+    def __init__(self, params, lr=1e-1, momentum=0.0, weight_decay=1e-4):
         defaults = dict(lr=lr, momentum=momentum, weight_decay=weight_decay)
         super(Shampoo, self).__init__(params, defaults)
 
@@ -32,6 +32,8 @@ class Shampoo(Optimizer):
                 grad = p.grad.data
                 if grad.is_sparse:
                     raise RuntimeError('AdamW does not support sparse gradients, please consider SparseAdam instead')
+                if group['weight_decay'] != 0:
+                    grad = grad.add(group['weight_decay'], p.data)
 
                 state = self.state[p]
                 if len(state) == 0:
@@ -43,8 +45,8 @@ class Shampoo(Optimizer):
                     state['R_inv_quarter'] = p.data.new(n, n).zero_()
                     state['exp_avg'] = grad
 
-                # state['exp_avg'].mul_(group['momentum']).add_(1 - group['momentum'], grad)
-                # grad = state['exp_avg']
+                state['exp_avg'].mul_(group['momentum']).add_(1 - group['momentum'], grad)
+                grad = state['exp_avg']
 
                 # State initialization
                 if p.dim() == 2 or p.dim() == 4:
