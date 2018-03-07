@@ -43,8 +43,8 @@ class Shampoo(Optimizer):
                     state['R_inv_quarter'] = p.data.new(n, n).zero_()
                     state['exp_avg'] = grad
 
-                state['exp_avg'].mul_(group['momentum']).add_(1 - group['momentum'], grad)
-                grad = state['exp_avg']
+                # state['exp_avg'].mul_(group['momentum']).add_(1 - group['momentum'], grad)
+                # grad = state['exp_avg']
 
                 # State initialization
                 if p.dim() == 2 or p.dim() == 4:
