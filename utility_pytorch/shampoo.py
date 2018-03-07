@@ -10,9 +10,7 @@ class Shampoo(Optimizer):
         super(Shampoo, self).__init__(params, defaults)
 
     def quarter(self, mat):
-        import IPython
-        IPython.embed()
-        u, v = torch.symeig(mat, True)
+        u, v = torch.symeig(mat, True, True)
         return v @  (u ** -0.25 + 1.0e-6).diag() @ v.t()
 
     def step(self, closure=None):
