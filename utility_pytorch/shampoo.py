@@ -10,8 +10,8 @@ class Shampoo(Optimizer):
         super(Shampoo, self).__init__(params, defaults)
 
     def quarter(self, mat, eps=1.0e-6):
-        s, v, d = torch.svd(mat)
-        return s @  ((v + eps) ** -0.25).diag() @ s.t()
+        s, v, _ = torch.svd(mat)
+        return s @  (((v + eps) ** - 0.25) + eps).diag() @ s.t()
 
     @staticmethod
     def prod(size):
@@ -41,7 +41,7 @@ class Shampoo(Optimizer):
                     state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-4).diag()
                     state['L_inv_quarter'] = p.data.new(m, m).zero_()
                     state['R_inv_quarter'] = p.data.new(n, n).zero_()
-                    state['exp_avg'] = grad
+                    # state['exp_avg'] = grad
 
                 # state['exp_avg'].mul_(group['momentum']).add_(1 - group['momentum'], grad)
                 # grad = state['exp_avg']
