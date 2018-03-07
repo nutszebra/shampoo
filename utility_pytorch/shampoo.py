@@ -33,16 +33,23 @@ class Shampoo(Optimizer):
                     grad = grad.view(p.data.size(0), -1)
                     if len(state) == 0:
                         m, n = grad.size()
-                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0).diag()
-                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0).diag()
-
+                        state['step'] = 0
+                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
+                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
+                        state['L_inv_quarter'] = p.data.new(m, m).zero_()
+                        state['R_inv_quarter'] = p.data.new(n, n).zero_()
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
                     R = R + grad.t() @ grad
-                    step_size = (group['lr'] * self.quarter(L) @ grad @self.quarter(R)).view(p.data.size())
+                    if (state['step'] % 10) == 0:
+                        state['L_inv_quarter'] = self.quarter(L)
+                        state['R_inv_quarter'] = self.quarter(R)
+                    L_inv_quarter, R_inv_quarter = state['L_inv_quarter'], state['R_inv_quarter']
+                    step_size = (group['lr'] * L_inv_quarter @ grad @s R_inv_quarter).view(p.data.size())
                 else:
                     step_size = group['lr'] * grad
                 p.data += -step_size
                 if group['weight_decay'] != 0:
                     p.data.add_(-group['weight_decay'], p.data)
+                state['step'] += 1
         return loss
