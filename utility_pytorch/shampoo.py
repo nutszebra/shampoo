@@ -32,15 +32,13 @@ class Shampoo(Optimizer):
                 grad = p.grad.data
                 if grad.is_sparse:
                     raise RuntimeError('AdamW does not support sparse gradients, please consider SparseAdam instead')
-                if group['weight_decay'] != 0:
-                    grad = grad.add(group['weight_decay'], p.data)
 
                 state = self.state[p]
                 if len(state) == 0:
                     m, n = grad.size()[0], self.prod(grad.size()[1:])
                     state['step'] = 0
-                    state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-4).diag()
-                    state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-4).diag()
+                    state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
+                    state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
                     state['L_inv_quarter'] = p.data.new(m, m).zero_()
                     state['R_inv_quarter'] = p.data.new(n, n).zero_()
                     state['exp_avg'] = grad
