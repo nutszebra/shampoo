@@ -11,7 +11,7 @@ class Shampoo(Optimizer):
 
     def quarter(self, mat):
         s, v, d = torch.svd(mat)
-        return s @  (u ** -0.25 + 1.0e-6).diag() @ s.t()
+        return s @  (v ** -0.25 + 1.0e-6).diag() @ s.t()
 
     def step(self, closure=None):
         loss = None
