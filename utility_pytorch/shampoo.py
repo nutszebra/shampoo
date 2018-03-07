@@ -5,7 +5,7 @@ from torch.optim import Optimizer
 
 class Shampoo(Optimizer):
 
-    def __init__(self, params, lr=1e-3, weight_decay=1e-4):
+    def __init__(self, params, lr=1e-1, weight_decay=1e-4):
         defaults = dict(lr=lr, weight_decay=weight_decay)
         super(Shampoo, self).__init__(params, defaults)
 
@@ -33,8 +33,8 @@ class Shampoo(Optimizer):
                     grad = grad.view(p.data.size(0), -1)
                     if len(state) == 0:
                         m, n = grad.size()
-                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
-                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
+                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-1).diag()
+                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-1).diag()
 
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
