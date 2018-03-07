@@ -54,7 +54,7 @@ class Shampoo(Optimizer):
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
                     R = R + grad.t() @ grad
-                    if (state['step'] % 10) == 0:
+                    if (state['step'] % 20) == 0:
                         state['L_inv_quarter'] = self.quarter(L)
                         state['R_inv_quarter'] = self.quarter(R)
                     L_inv_quarter, R_inv_quarter = state['L_inv_quarter'], state['R_inv_quarter']
