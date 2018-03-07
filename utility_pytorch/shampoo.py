@@ -11,7 +11,7 @@ class Shampoo(Optimizer):
 
     def quarter(self, mat):
         u, v = torch.symeig(mat, True, True)
-        return v @  (u ** -0.25 + 1.0e-8).diag() @ v.t()
+        return v @  (u ** -0.25 + 1.0e-6).diag() @ v.t()
 
     def step(self, closure=None):
         loss = None
@@ -33,8 +33,8 @@ class Shampoo(Optimizer):
                     grad = grad.view(p.data.size(0), -1)
                     if len(state) == 0:
                         m, n = grad.size()
-                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-5).diag()
-                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-6).diag()
+                        state['L'] = p.data.new(m, m).zero_() + (p.data.new(m).zero_() + 1.0e-3).diag()
+                        state['R'] = p.data.new(n, n).zero_() + (p.data.new(n).zero_() + 1.0e-3).diag()
 
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
