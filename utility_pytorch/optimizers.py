@@ -135,10 +135,10 @@ class AMSGradW(object):
 
 class Shampoo(object):
 
-    def __init__(self, model, lr, schedule=[100, 150], lr_decay=0.1, weight_decay=1.0e-4):
+    def __init__(self, model, lr, momentum=0.9, schedule=[100, 150], lr_decay=0.1, weight_decay=1.0e-4):
         self.model, self.lr = model, lr
         self.schedule, self.lr_decay, self.weight_decay = schedule, lr_decay, weight_decay
-        self.optimizer = shampoo.Shampoo(model.parameters(), lr=lr, weight_decay=weight_decay)
+        self.optimizer = shampoo.Shampoo(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 
     def __call__(self, i):
         if i in self.schedule:

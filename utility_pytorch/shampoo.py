@@ -5,7 +5,7 @@ from torch.optim import Optimizer
 
 class Shampoo(Optimizer):
 
-    def __init__(self, params, momentum=0.9, lr=1e-1, weight_decay=1e-4):
+    def __init__(self, params, lr=1e-1, momentum=0.9, weight_decay=1e-4):
         defaults = dict(lr=lr, momentum=momentum, weight_decay=weight_decay)
         super(Shampoo, self).__init__(params, defaults)
 
@@ -54,7 +54,7 @@ class Shampoo(Optimizer):
                     L, R = state['L'], state['R']
                     L = L + grad @ grad.t()
                     R = R + grad.t() @ grad
-                    if (state['step'] % 20) == 0:
+                    if (state['step'] % 10) == 0:
                         state['L_inv_quarter'] = self.quarter(L)
                         state['R_inv_quarter'] = self.quarter(R)
                     L_inv_quarter, R_inv_quarter = state['L_inv_quarter'], state['R_inv_quarter']
